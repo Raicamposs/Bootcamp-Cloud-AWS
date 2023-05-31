@@ -1,0 +1,39 @@
+
+@baseUrl = http://localhost:3000/dev
+@contentType = application/json
+
+
+# @name hello 
+GET {{baseUrl}}  HTTP/1.1
+Content-Type: {{contentType}}
+###
+
+#  @name insertItem
+POST {{baseUrl}}/item  HTTP/1.1
+Content-Type: {{contentType}}
+
+{
+    "item": "item {{$randomInt 1 999}}"
+}
+###
+
+# @name fetchItems
+GET {{baseUrl}}/items  HTTP/1.1
+Content-Type: {{contentType}}
+###
+
+@itemId = {{ insertItem.response.body.$.id }}
+
+# @name fetchItem
+GET {{baseUrl}}/items/{{itemId}}  HTTP/1.1
+Content-Type: {{contentType}}
+###
+
+# @name updateItem
+PUT {{baseUrl}}/items/{{itemId}}  HTTP/1.1
+Content-Type: {{contentType}}
+
+{
+    "itemStatus": true
+}
+###

@@ -1,0 +1,70 @@
+service: bootcamp-cloud-aws-serverless
+frameworkVersion: "3"
+
+provider:
+  name: aws
+  runtime: nodejs16.x
+  environment:
+    LOCALSTACK_HOST: ${env:LOCALSTACK_HOST, "localhost"}
+
+plugins:
+  - serverless-offline
+
+custom:
+  localstack:
+    stages:
+      - local
+    # desabilitar o localstack quando fizer deploy
+    autostart: false
+
+  serverless-offline:
+    useChildProcesses: true
+
+package:
+  individually: true
+  excludeDevDependencies: true
+
+functions:
+  hello:
+    handler: src/hello.handler
+    events:
+      - http:
+          path: /
+          method: get
+  insertItem:
+    handler: src/insertItem.handler
+    events:
+      - http:
+          path: /item
+          method: post
+  fetchItems:
+    handler: src/fetchItems.handler
+    events:
+      - http:
+          path: /items
+          method: get
+  fetchItem:
+    handler: src/fetchItem.handler
+    events:
+      - http:
+          path: /items/{id}
+          method: get
+  updateItem:
+    handler: src/updateItem.handler
+    events:
+      - http:
+          path: /items/{id}
+          method: put
+resources:
+  Resources:
+    ItemTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ItemTable
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
